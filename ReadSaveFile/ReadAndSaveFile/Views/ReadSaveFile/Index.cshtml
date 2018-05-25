@@ -1,0 +1,101 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Ler Arquivo";
+}
+
+
+@using (Html.BeginForm("UploadFile", "ReadSaveFile", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    if (!string.IsNullOrEmpty(ViewBag.Retorno))
+    {
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="alert alert-info">
+                    @Html.Raw(ViewBag.Retorno)
+                </div>
+            </div>
+        </div>
+    }
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="alert alert-success">
+                <h4>Importar arquivo (.TXT)</h4>
+                <p>Favor selecionar um arquivo no formato csv.</p>
+                <p>No Seguinte Formato</p>
+                <p>     Linha1: FORNECEDOR1|TIAGO ESTEVES DE SOUZA</p>
+                <p>     Linha2: FORNECEDOR2|KAROLINA ALENCAR GONÇALVES</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="input-group">
+                <span class="input-group-addon" id="file-group">Arquivo</span>
+                <input type="text" class="form-control" id="input-file" placeholder=".../.../">
+            </div>
+            <input type="file" name="ARQUIVO" class="hide" id="input-file-hide" accept=".txt" />
+        </div>
+    </div>
+    <div class="row"><hr /></div>
+    <div class="row">
+        <div class="col-sm-6" id="tableForn">
+
+        </div>
+    </div>
+    <div class="row"><hr /></div>
+    <div class="row">
+        <div class="col-sm-3">
+            @Html.Hidden("ACAO", new { value = 0 }) @*se clicar para importar mudar para 1*@
+            <input type="submit" class="btn btn-block btn-info" id="importar" value="Importar Arquivo" />
+        </div>
+        <div class="col-sm-3">
+            <input type="submit" class="btn btn-block btn-info" id="importar" value="Ler Arquivo" />
+        </div>
+
+        <div class="col-sm-3">
+            <input type="button" class="btn btn-block btn-info" id="listar" value="Listar Fornecedores" />
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+    window.onload = function () {
+        $("#input-file, #file-group").click(function () {
+            $("#input-file-hide").click();
+        });
+
+        $("#input-file-hide").change(function () {
+            $("#input-file").val($(this).val());
+        });
+
+        $("#importar").click(function () {
+            $("#ACAO").val(1);
+        });
+
+        $("#listar").click(function () {
+            $.get('@Url.Content("~/ReadSaveFile/Get")', function (data) {
+
+                var table = '<h3>LISTA DE FORNECEDORES</h3><table class="table">' +
+                '    <thead>' +
+                '        <tr>' +
+                '            <th scope="col">#</th>' +
+                '            <th scope="col">Nome</th>' +
+                '        </tr>' +
+                '    </thead>' +
+                '    <tbody>';
+
+                for (var i = 0; i < data.length; i++) {
+                    console.log(data[i].ID);
+                    var NOME = data[i].NOME;
+                    var ID = data[i].ID;
+
+                    table = table + '<tr><th scope="row">' + ID + '</th><td>' + NOME + '</td></tr>';              
+                }
+
+                table = table + '</tbody></table>';           
+                $("#tableForn").html(table);          
+            });
+        });
+    };
+</script>
